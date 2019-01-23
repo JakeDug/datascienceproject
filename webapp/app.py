@@ -45,7 +45,7 @@ class Patient(UserMixin, db.Model):
         doctorId = db.Column(db.ForeignKey('User.id'), nullable=False)
         dob = db.Column(db.Dateime, nullable=False)
 
-#define forms and their fields that will display for signup and login
+#define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
     username = StringField('USERNAME', validators=[InputRequired(), Length(min=6, max=15)])
     password = PasswordField('PASSWORD', validators=[InputRequired(), Length(min=8, max=30)])
@@ -59,6 +59,9 @@ class addPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
     dob = DateField('Date of Birth', format='%Y-%m-%d')
+
+class searchPatientForm(FlaskForm):
+    patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
 
 
 @login_manager.user_loader
@@ -80,12 +83,11 @@ def login():
             if user.password == form.password.data:
                 login_user(user)
                 return redirect(url_for('welcome'))
-        #invalid details
+        # TODO: invalid details
 
     return render_template('login.html',
                             title='Login',
                             form=form)
-
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -94,7 +96,7 @@ def signup():
     form = signupForm()
 
     if form.validate_on_submit():
-        #create new user object and add to device
+        #create new user object and add to db
         new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
         db.session.add(new_user)
         db.session.commit()
@@ -119,9 +121,48 @@ def addPatient():
 
     form = addPatientForm()
 
+    if form.validate_on_submit():
+        #create new patient object and add to db
+        new_patient = Patient(patientName = form.patientName.data,
+                            patientSymptoms = form.patientSymptoms.data,
+                            doctorId = current_user.get_id(),
+                            dob = form.dob.data)
+        db.session.add(new_patient)
+        db.session.commit()
+
     return render_template('addPatient.html',
                         title='Add patient data',
                         form=form)
+
+@app.route('/searchPatient')
+@login_required
+def searchPatient():
+
+    #1: initially display form to select a user from
+    #2: Then after submitted display the details of the patient
+
+    form = searchPatientForm()
+
+    if form.validate_on_submit():
+        # find matching patient
+        # TODO: what if no match
+        patient = Patient.query.filter_by(patientName=form.patientName.data).first()
+
+        return redirect(url_for('viewPatient', patient))
+
+    return render_template('searchPatient.html',
+                        title='Search for a patient',
+                        form=form)
+
+@app.route('/viewDetails')
+@login_required
+def viewPatient():
+
+    patient = request.args['patient']
+
+    return render_template('viewPatient.html',
+                         title="Viewing patient",
+                         patient=patient)
 
 
 @app.route("/logout")
