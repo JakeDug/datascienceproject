@@ -5,6 +5,7 @@ import numpy as np
 def main():
     
     path = "C:/Users/Jake/Documents/chest_xray/train/NORMAL/"
+    outputPath = "C:/Users/Jake/Documents/"
     imgName = "IM-0115-0001.jpeg"
     imgpath = path + imgName
 
@@ -27,15 +28,15 @@ def main():
     output = res1.reshape((img.shape))
 
     output = [img, output]
-    titles = ['Original Image', imgName + 'K = ' + str(K)]
+    titles = ['Original Image', imgName + ' K = ' + str(K)]
     
-    for i in range(2):
-        plt.subplot(2, 1, i+1)
-        plt.imshow(output[i])
-        plt.title(titles[i])
-        plt.xticks([])
-        plt.yticks([])
+
+    plt.imshow(output[1], aspect='auto')
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig( 'test.png');
     plt.show()
+
 
 if __name__ == "__main__":
     main()
