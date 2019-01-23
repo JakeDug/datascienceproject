@@ -33,14 +33,17 @@ db = SQLAlchemy(app)
 #define the user table and its columns
 class User(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        username = db.Column(db.String(30), unique=True)
-        email =  db.Column(db.String(50), unique=True)
-        password =  db.Column(db.String(40))
+        username = db.Column(db.String(30), unique=True, nullable=False)
+        email =  db.Column(db.String(50), unique=True, nullable=False)
+        password =  db.Column(db.String(40), nullable=False)
 
 #define the patient table and its columns
 class Patient(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        patientname = db.Column(db.String(30))
+        patientName = db.Column(db.String(30), nullable=False)
+        patientSymptoms = db.Column(db.String(60), nullable=False)
+        doctorId = db.Column(db.ForeignKey('User.id'), nullable=False)
+        dob = db.Column(db.Dateime, nullable=False)
 
 #define forms and their fields that will display for signup and login
 class loginForm(FlaskForm):
@@ -51,6 +54,11 @@ class signupForm(FlaskForm):
     username = StringField('USERNAME', validators=[InputRequired(), Length(min=6, max=15)])
     email = StringField('EMAIL', validators=[InputRequired(), Email(message='Invalid email'), Length(max=40)])
     password = PasswordField('PASSWORD', validators=[InputRequired(), Length(min=8, max=30)])
+
+class addPatientForm(FlaskForm):
+    patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
+    patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
+    dob = DateField('Date of Birth', format='%Y-%m-%d')
 
 
 @login_manager.user_loader
@@ -103,6 +111,17 @@ def welcome():
     return render_template('welcome.html',
                         title='Successful Login',
                         name = current_user.username)
+
+
+@app.route('/addPatient')
+@login_required
+def addPatient():
+
+    form = addPatientForm()
+
+    return render_template('addPatient.html',
+                        title='Add patient data',
+                        form=form)
 
 
 @app.route("/logout")
