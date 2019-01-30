@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = 'dernynanana'
 #    databasename="HootProject$hoot",
 #)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////mnt/c/Users/elite/Desktop/Data Science Project/webapp/app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
 Bootstrap(app)
 login_manager = LoginManager()
@@ -34,16 +34,16 @@ db = SQLAlchemy(app)
 class User(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         username = db.Column(db.String(30), unique=True, nullable=False)
-        email =  db.Column(db.String(50), unique=True, nullable=False)
-        password =  db.Column(db.String(40), nullable=False)
+        email = db.Column(db.String(50), unique=True, nullable=False)
+        password = db.Column(db.String(40), nullable=False)
 
 #define the patient table and its columns
 class Patient(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         patientName = db.Column(db.String(30), nullable=False)
         patientSymptoms = db.Column(db.String(60), nullable=False)
-        doctorId = db.Column(db.ForeignKey('User.id'), nullable=False)
-        dob = db.Column(db.Dateime, nullable=False)
+        doctorId = db.Column(db.ForeignKey(User.id), nullable=False)
+        dob = db.Column(db.DateTime, nullable=False)
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
@@ -68,10 +68,12 @@ class searchPatientForm(FlaskForm):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 @app.route('/')
 def home():
     return render_template('index.html',
                             title='Welcome to Pneumonia app')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
