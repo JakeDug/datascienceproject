@@ -85,6 +85,12 @@ def login():
             if user.password == form.password.data:
                 login_user(user)
                 return redirect(url_for('welcome'))
+            else:
+                flash('Invalid login details', 'error')
+                return render_template('login.html', title='Login', form=form)
+        else:
+            flash('Invalid login details', 'error')
+            return render_template('login.html', title='Login', form=form)
         # TODO: invalid details
 
     return render_template('login.html',
@@ -98,10 +104,21 @@ def signup():
     form = signupForm()
 
     if form.validate_on_submit():
-        #create new user object and add to db
-        new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
-        db.session.add(new_user)
-        db.session.commit()
+
+        #check if username or email already exists - if not create user
+        user = User.query.filter_by(username=form.username.data).first()
+        email = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash('Try a different user name', 'error')
+            return render_template('signup.html', title='Sign Up', form=form)
+        elif email:
+            flash('Try a different email', 'error')
+            return render_template('signup.html', title='Sign Up', form=form)
+        else:
+            #create new user object and add to db
+            new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
 
     return render_template('signup.html',
                         title='Sign Up',
