@@ -1,5 +1,6 @@
 # Pneumonia Recognition System
 This application was created to aid medical profesionals in diagnosing pneumonia through a patients' x-ray
+
 Created as part of 4th year Software Development data science module for lecturer Greg Doyle
 
 # Image Recognition
