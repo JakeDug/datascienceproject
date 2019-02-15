@@ -19,3 +19,6 @@ Created using Python and FLask with the help of the following libraries
 - Adriaan Van Wyk
 - Jake Duggan
 - Neil Grogan
+
+# Live app on python anywhere (Still in progress)
+http://pneumoniarecognition.pythonanywhere.com/
