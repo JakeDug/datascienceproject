@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
 
@@ -18,8 +19,17 @@
   </div>
 </nav>
 
-<div class="container-fluid center_div">
-<h1 class="text-center well-lg"> Welcome {{name}}! </h1>
+<div class="container center_div">
+  <h1 class="text-center well-lg"> {{title}} </h1>
+
+  <form action = '' method='post'>
+
+    {{ form.hidden_tag() }}
+    {{ wtf.form_field(form.patientName) }}
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit"> Find Patient </button>
+
+  </form>
 
 </div>
 {% endblock %}

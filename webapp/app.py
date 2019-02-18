@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = 'dernynanana'
 #    databasename="HootProject$hoot",
 #)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////mnt/c/Users/elite/Desktop/Data Science Project/webapp/app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
 Bootstrap(app)
 login_manager = LoginManager()
@@ -33,16 +33,19 @@ db = SQLAlchemy(app)
 #define the user table and its columns
 class User(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        username = db.Column(db.String(30), unique=True)
-        email =  db.Column(db.String(50), unique=True)
-        password =  db.Column(db.String(40))
+        username = db.Column(db.String(30), unique=True, nullable=False)
+        email = db.Column(db.String(50), unique=True, nullable=False)
+        password = db.Column(db.String(40), nullable=False)
 
 #define the patient table and its columns
 class Patient(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        patientname = db.Column(db.String(30))
+        patientName = db.Column(db.String(30), nullable=False)
+        patientSymptoms = db.Column(db.String(60), nullable=False)
+        doctorId = db.Column(db.ForeignKey(User.id), nullable=False)
+        dob = db.Column(db.DateTime, nullable=False)
 
-#define forms and their fields that will display for signup and login
+#define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
     username = StringField('USERNAME', validators=[InputRequired(), Length(min=6, max=15)])
     password = PasswordField('PASSWORD', validators=[InputRequired(), Length(min=8, max=30)])
@@ -52,15 +55,25 @@ class signupForm(FlaskForm):
     email = StringField('EMAIL', validators=[InputRequired(), Email(message='Invalid email'), Length(max=40)])
     password = PasswordField('PASSWORD', validators=[InputRequired(), Length(min=8, max=30)])
 
+class addPatientForm(FlaskForm):
+    patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
+    patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
+    dob = DateField('Date of Birth', format='%Y-%m-%d')
+
+class searchPatientForm(FlaskForm):
+    patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 @app.route('/')
 def home():
     return render_template('index.html',
                             title='Welcome to Pneumonia app')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -72,12 +85,17 @@ def login():
             if user.password == form.password.data:
                 login_user(user)
                 return redirect(url_for('welcome'))
-        #invalid details
+            else:
+                flash('Invalid login details', 'error')
+                return render_template('login.html', title='Login', form=form)
+        else:
+            flash('Invalid login details', 'error')
+            return render_template('login.html', title='Login', form=form)
+        # TODO: invalid details
 
     return render_template('login.html',
                             title='Login',
                             form=form)
-
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -86,10 +104,21 @@ def signup():
     form = signupForm()
 
     if form.validate_on_submit():
-        #create new user object and add to device
-        new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
-        db.session.add(new_user)
-        db.session.commit()
+
+        #check if username or email already exists - if not create user
+        user = User.query.filter_by(username=form.username.data).first()
+        email = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash('Try a different user name', 'error')
+            return render_template('signup.html', title='Sign Up', form=form)
+        elif email:
+            flash('Try a different email', 'error')
+            return render_template('signup.html', title='Sign Up', form=form)
+        else:
+            #create new user object and add to db
+            new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
 
     return render_template('signup.html',
                         title='Sign Up',
@@ -103,6 +132,56 @@ def welcome():
     return render_template('welcome.html',
                         title='Successful Login',
                         name = current_user.username)
+
+
+@app.route('/addPatient')
+@login_required
+def addPatient():
+
+    form = addPatientForm()
+
+    if form.validate_on_submit():
+        #create new patient object and add to db
+        new_patient = Patient(patientName = form.patientName.data,
+                            patientSymptoms = form.patientSymptoms.data,
+                            doctorId = current_user.get_id(),
+                            dob = form.dob.data)
+        db.session.add(new_patient)
+        db.session.commit()
+
+    return render_template('addPatient.html',
+                        title='Add patient data',
+                        form=form)
+
+@app.route('/searchPatient')
+@login_required
+def searchPatient():
+
+    #1: initially display form to select a user from
+    #2: Then after submitted display the details of the patient
+
+    form = searchPatientForm()
+
+    if form.validate_on_submit():
+        # find matching patient
+        # TODO: what if no match
+        patient = Patient.query.filter_by(patientName=form.patientName.data).first()
+
+        return redirect(url_for('viewPatient', patient))
+
+    return render_template('searchPatient.html',
+                        title='Search for a patient',
+                        form=form)
+
+@app.route('/viewDetails')
+@login_required
+def viewPatient():
+
+    patient = request.args['patient']
+
+    return render_template('viewPatient.html',
+                         title="Viewing patient",
+                         patient=patient)
 
 
 @app.route("/logout")

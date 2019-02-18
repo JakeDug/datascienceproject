@@ -3,8 +3,25 @@
 
 {% block content %}
 
+<nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container-fluid">
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="navbar-text"><a href="{{ url_for('signup')}}">Sign Up</a></li>
+          <li class="navbar-text"><a href="{{ url_for('login') }}">Login</a></li>
+        </ul>
+      </div>
+  </div>
+</nav>
+
 <div class="container center_div">
 <h1 class="form-signin-heading text-center well-lg"> {{title}} </h1>
+
+  <div align="center" class="text-danger">
+    {% for message in get_flashed_messages() %}
+    <h2>  {{ message }} </h2>
+    {% endfor %}
+  </div>
 
   <form class="form-signin" action = '/login' method='post'>
           {{ form.hidden_tag() }}
