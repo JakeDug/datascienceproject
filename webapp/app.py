@@ -10,6 +10,9 @@ from flask_bootstrap import Bootstrap
 #jake
 from flask_uploads import UploadSet, IMAGES
 from flask_wtf.file import FileField, FileAllowed, FileRequired
+from werkzeug.utils import secure_filename
+
+import os
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -68,7 +71,7 @@ class addPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
     dob = DateField('Date of Birth', format='%Y-%m-%d')
-    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'IMAGES ONLY') ])
+    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
 
 class searchPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
@@ -144,11 +147,10 @@ def welcome():
                         name = current_user.username)
 
 
-@app.route('/addPatient')
+@app.route('/addPatient', methods=['GET', 'POST'])
 @login_required
 def addPatient():
 
-    ## TODO: add image analysis
     form = addPatientForm()
 
     if form.validate_on_submit():
@@ -158,21 +160,32 @@ def addPatient():
                             doctorId = current_user.get_id(),
                             dob = form.dob.data
                             )
-        
+        db.session.add(new_patient)
+        db.session.commit()
+
+        # save image
         f = form.img.data
         filename = secure_filename(f.filename)
         f.save(os.path.join(
-            app.instance_path, 'user_xrays', filename
+            'user_xrays', filename
         ))
-        
-        db.session.add(new_patient)
+
+        # save image path in db
+        new_image = Images(imgPath = 'user_xrays/' + filename,
+                        patientId = new_patient.id)
+
+        db.session.add(new_image)
+
+
+        # analysis of images
+
         db.session.commit()
 
     return render_template('addPatient.html',
                         title='Add patient data',
                         form=form)
 
-@app.route('/searchPatient')
+@app.route('/searchPatient', methods=['GET', 'POST'])
 @login_required
 def searchPatient():
 
@@ -186,7 +199,7 @@ def searchPatient():
         patient = Patient.query.filter_by(patientName=form.patientName.data).first()
 
         if patient:
-            return redirect(url_for('viewPatient', patient))
+            return redirect(url_for('viewPatient', patientId=patient.id))
         else:
             flash('No matching patient found', 'error')
             return render_template('searchPatient.html',
@@ -196,15 +209,39 @@ def searchPatient():
                         title='Search for a patient',
                         form=form)
 
-@app.route('/viewDetails')
+@app.route('/viewDetails/<patientId>', methods=['GET', 'POST'])
 @login_required
-def viewPatient():
+def viewPatient(patientId):
 
-    patient = request.args['patient']
+    #patient = request.args['patient']
+
+    patient = Patient.query.filter_by(id=patientId).first()
+
+    form = addPatientForm()
+
+    if form.validate_on_submit():
+        # TO - DO edit patient details
+
+        new_name = form.patientName.data
+        new_symptoms = form.patientSymptoms.data
+
+        if new_name != ' ':
+            patient.patientName = new_name
+        if new_symptoms != '':
+            patient.patientSymptoms = new_symptoms
+
+        db.session.commit()
+
+        return render_template('viewPatient.html',
+                             title="Viewing patient",
+                             patient=patient,
+                             form=form)
+
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
-                         patient=patient)
+                         patient=patient,
+                         form=form)
 
 
 @app.route("/logout")

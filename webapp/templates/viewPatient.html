@@ -3,12 +3,41 @@
 
 {% block content %}
 
+<nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{{ url_for('welcome')}}">Pneumonia app</a>
+        </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="navbar-text"><a href="{{ url_for('welcome')}}">Home</a></li>
+          <li class="navbar-text"><a href="{{ url_for('searchPatient') }}">Search for a patient</a></li>
+          <li class="navbar-text"><a href="{{ url_for('addPatient') }}">Add a patient</a></li>
+          <li class="navbar-text"><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </div>
+  </div>
+</nav>
+
 <div class="container center_div">
   <h1 class="text-center well-lg"> {{title}} </h1>
 
-    {{ patient.patientName }}
-    {{ patient.patientDetails }}
-    {{ patient.dob }}
+  <div class="text-center well-lg">
+      {{ patient.patientName }} <br>
+      {{ patient.patientDetails }} <br>
+      {{ patient.dob }}
+  </div>
+
+<h2> Edit patient information </h2> <br/>
+<h3> (empty fields will not be updated) </h3>
+    <form action = '' method='post'>
+
+      {{ form.hidden_tag() }}
+      {{ wtf.form_field(form.patientName) }}
+      {{ wtf.form_field(form.patientSymptoms) }}
+
+      <button class="btn btn-lg btn-primary btn-block" type="submit"> Confirm new patient changes </button>
+    </form>
 
 </div>
 {% endblock %}
