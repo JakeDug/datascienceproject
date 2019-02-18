@@ -138,6 +138,7 @@ def welcome():
 @login_required
 def addPatient():
 
+    ## TODO: add image analysis
     form = addPatientForm()
 
     if form.validate_on_submit():
