@@ -156,7 +156,15 @@ def addPatient():
         new_patient = Patient(patientName = form.patientName.data,
                             patientSymptoms = form.patientSymptoms.data,
                             doctorId = current_user.get_id(),
-                            dob = form.dob.data)
+                            dob = form.dob.data
+                            )
+        
+        f = form.img.data
+        filename = secure_filename(f.filename)
+        f.save(os.path.join(
+            app.instance_path, 'user_xrays', filename
+        ))
+        
         db.session.add(new_patient)
         db.session.commit()
 
