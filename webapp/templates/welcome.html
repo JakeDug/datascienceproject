@@ -10,15 +10,16 @@
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li class="navbar-text"><a href="{{ url_for('welcome')}}">Home</a></li>
-          <li class="navbar-text"><a href="{{ url_for('') }}"></a></li>
-          <li class="navbar-text"><a href="{{ url_for('') }}"></a></li>
+          <li class="navbar-text"><a href="{{ url_for('searchPatient') }}">Search for a patient</a></li>
+          <li class="navbar-text"><a href="{{ url_for('addPatient') }}">Add a patient</a></li>
+          <li class="navbar-text"><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
       </div>
   </div>
 </nav>
 
 <div class="container-fluid center_div">
-<h1 class="text-center well-lg"> Welcome! </h1>
+<h1 class="text-center well-lg"> Welcome {{name}}! </h1>
 
 </div>
 {% endblock %}
