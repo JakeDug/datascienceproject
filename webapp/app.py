@@ -174,12 +174,16 @@ def searchPatient():
     form = searchPatientForm()
 
     if form.validate_on_submit():
-        # find matching patient
-        # TODO: what if no match
+
         patient = Patient.query.filter_by(patientName=form.patientName.data).first()
 
-        return redirect(url_for('viewPatient', patient))
-
+        if patient:
+            return redirect(url_for('viewPatient', patient))
+        else:
+            flash('No matching patient found', 'error')
+            return render_template('searchPatient.html',
+                                title='Search for a patient',
+                                form=form)
     return render_template('searchPatient.html',
                         title='Search for a patient',
                         form=form)
