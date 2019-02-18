@@ -45,6 +45,12 @@ class Patient(UserMixin, db.Model):
         doctorId = db.Column(db.ForeignKey(User.id), nullable=False)
         dob = db.Column(db.DateTime, nullable=False)
 
+#define the images table and its columns
+class Images(UserMixin, db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        imgPath = db.Column(db.String(120), nullable=False)
+        patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
+
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
     username = StringField('USERNAME', validators=[InputRequired(), Length(min=6, max=15)])
@@ -138,6 +144,7 @@ def welcome():
 @login_required
 def addPatient():
 
+    ## TODO: add image analysis
     form = addPatientForm()
 
     if form.validate_on_submit():
