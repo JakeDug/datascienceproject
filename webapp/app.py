@@ -7,6 +7,9 @@ from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired, Length, Email
 from flask_bootstrap import Bootstrap
+#jake
+from flask_uploads import UploadSet, IMAGES
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -65,6 +68,7 @@ class addPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
     dob = DateField('Date of Birth', format='%Y-%m-%d')
+    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'IMAGES ONLY') ])
 
 class searchPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
