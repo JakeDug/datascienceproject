@@ -5,7 +5,10 @@
 <nav class="navbar navbar-inverse navbar-static-top">
   <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="{{ url_for('welcome')}}">Pneumonia app</a>
+          <a class="navbar-brand" href="{{ url_for('welcome')}}">
+            <img src="{{url_for('static', filename='Images/logo.png')}}" width="110em" height="110em" alt="Pneumonia App">
+          </a>
+
         </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">

@@ -213,34 +213,31 @@ def searchPatient():
 @login_required
 def viewPatient(patientId):
 
-    #patient = request.args['patient']
-
     patient = Patient.query.filter_by(id=patientId).first()
+
+    doctor = User.query.filter_by(id=patient.doctorId).first()
 
     form = addPatientForm()
 
     if form.validate_on_submit():
-        # TO - DO edit patient details
 
-        new_name = form.patientName.data
         new_symptoms = form.patientSymptoms.data
 
-        if new_name != ' ':
-            patient.patientName = new_name
-        if new_symptoms != '':
-            patient.patientSymptoms = new_symptoms
+        patient.patientSymptoms = new_symptoms
 
         db.session.commit()
 
         return render_template('viewPatient.html',
                              title="Viewing patient",
                              patient=patient,
+                             doctor=doctor,
                              form=form)
 
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
                          patient=patient,
+                         doctor=doctor,
                          form=form)
 
 

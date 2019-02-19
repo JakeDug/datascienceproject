@@ -22,21 +22,20 @@
 <div class="container center_div">
   <h1 class="text-center well-lg"> {{title}} </h1>
 
-  <div class="text-center well-lg">
-      {{ patient.patientName }} <br>
-      {{ patient.patientDetails }} <br>
-      {{ patient.dob }}
+  <div class="text-center well-lg" style="display: grid; ">
+    <label> Patient name:</label>  {{ patient.patientName }} <br><br>
+    <label> Patient Symptoms:</label>  {{ patient.patientSymptoms }} <br><br>
+    <label> Patient DoB:</label>  {{ patient.dob }} <br><br>
+    <label> Doctor:</label>{{ doctor.username }}
   </div>
-
-<h2> Edit patient information </h2> <br/>
-<h3> (empty fields will not be updated) </h3>
+ <br><br>
+<h2 class="text-center"> Edit patient symptoms </h2> <br/>
     <form action = '' method='post'>
 
       {{ form.hidden_tag() }}
-      {{ wtf.form_field(form.patientName) }}
       {{ wtf.form_field(form.patientSymptoms) }}
 
-      <button class="btn btn-lg btn-primary btn-block" type="submit"> Confirm new patient changes </button>
+      <button class="btn btn-lg btn-primary btn-block" type="submit"> Confirm new patient symptoms </button>
     </form>
 
 </div>
