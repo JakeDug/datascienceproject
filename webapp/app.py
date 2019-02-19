@@ -76,6 +76,9 @@ class addPatientForm(FlaskForm):
 class searchPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
 
+class updatePatientForm(FlaskForm):
+    patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -217,13 +220,15 @@ def viewPatient(patientId):
 
     doctor = User.query.filter_by(id=patient.doctorId).first()
 
-    form = addPatientForm()
+    form = updatePatientForm()
 
     if form.validate_on_submit():
 
-        new_symptoms = form.patientSymptoms.data
+        patient = Patient.query.filter_by(id=patientId).first()
 
-        patient.patientSymptoms = new_symptoms
+        #new_symptoms = form.patientSymptoms.data
+
+        patient.patientSymptoms = form.patientSymptoms.data
 
         db.session.commit()
 
