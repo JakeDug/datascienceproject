@@ -2,11 +2,11 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
-<nav class="navbar navbar-inverse navbar-static-top">
+<nav class="navbar navbar-inverse navbar-static-top" style="min-height: 7em;">
   <div class="container-fluid">
         <div class="navbar-header">
           <a class="navbar-brand" href="{{ url_for('welcome')}}">
-            <img src="{{url_for('static', filename='Images/logoResized.png')}}" width="90em" height="90em" class="margin: 0;" alt="Pneumonia App">
+            <img src="{{url_for('static', filename='Images/logoResized.png')}}" width="80em" height="80em" style="margin-top: -1;" alt="Pneumonia App">
           </a>
         </div>
       <div id="navbar" class="navbar-collapse collapse">
