@@ -37,11 +37,23 @@
 
   </div>
  <br><br>
+ <div class="container center_div">
+ <h2 class="text-center"> Add X-ray Image </h2> <br/>
+   <form action = '' method='post' enctype="multipart/form-data">
+
+     {{ form2.hidden_tag() }}
+     {{ wtf.form_field(form2.img) }}
+
+     <button class="btn" type="submit"> Add X-Ray </button>
+
+   </form>
+ </div>
+ <br><br>
 <h2 class="text-center"> Edit patient symptoms </h2> <br/>
     <form action = '' method='post'>
 
-      {{ form.hidden_tag() }}
-      {{ wtf.form_field(form.patientSymptoms) }}
+      {{ form1.hidden_tag() }}
+      {{ wtf.form_field(form1.patientSymptoms) }}
 
       <button class="btn btn-lg btn-primary btn-block" type="submit"> Confirm new patient symptoms </button>
     </form>
