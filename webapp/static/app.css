@@ -10,8 +10,8 @@
 	background-color: #e685ac;
 }
 
-form {
-
+img {
+	border: #8f4160;
 }
 
 body{
@@ -20,3 +20,6 @@ body{
 	font-family: Verdana, Georgia, monospace;
 }
 
+h1 {
+	color: #8f4160;
+}
