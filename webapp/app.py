@@ -221,6 +221,8 @@ def viewPatient(patientId):
 
     doctor = User.query.filter_by(id=patient.doctorId).first()
 
+    images = Images.query.filter_by(patientId=patientId).all()
+
     form = updatePatientForm()
 
     if form.validate_on_submit():
@@ -237,6 +239,7 @@ def viewPatient(patientId):
                              title="Viewing patient",
                              patient=patient,
                              doctor=doctor,
+                             images=images,
                              form=form)
 
 
@@ -244,6 +247,7 @@ def viewPatient(patientId):
                          title="Viewing patient",
                          patient=patient,
                          doctor=doctor,
+                         images=images,
                          form=form)
 
 
