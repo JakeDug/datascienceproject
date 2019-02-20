@@ -1,1 +1,22 @@
+.btn {
+	background-color: #8f4160;
+	color: #FFFFFF;
+	width: 100%;
+	
+}
+
+
+.btn:hover {
+	background-color: #e685ac;
+}
+
+form {
+
+}
+
+body{
+	background-image: url("bg.png");
+	background-color: #e0e5da;
+	font-family: Verdana, Georgia, monospace;
+}
 
