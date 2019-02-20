@@ -32,6 +32,7 @@
     <div class="text-center well-lg">
       <img src="{{url_for('static', filename=xray.imgPath)}}" style="max-height: 30em; max-width:30em;"> <br><br>
       <label> Verdict: </label>{{xray.analysis}} <br><br>
+      <label> confidence: </label>{{xray.confidence}} <br><br>
     </div>
     {% endfor %}
 

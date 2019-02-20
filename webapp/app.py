@@ -56,7 +56,8 @@ class Images(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         imgPath = db.Column(db.String(120), nullable=False)
         patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
-        analysis = db.Column(db.String(60))
+        analysis = db.Column(db.Boolean)
+        confidence = db.Column(db.Float)
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
@@ -72,7 +73,7 @@ class addPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
     dob = DateField('Date of Birth', format='%Y-%m-%d')
-    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
+    img = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
 
 class searchPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
@@ -172,21 +173,24 @@ def addPatient():
 
         # save image
         f = form.img.data
-        filename = secure_filename(f.filename)
-        f.save(os.path.join(
-            'static/user_xrays', filename
-        ))
 
-        # save image path in db
-        new_image = Images(imgPath = 'user_xrays/' + filename,
-                        patientId = new_patient.id)
+    #    if f.filename != '':
+        if form.img.data:
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(
+                'static/user_xrays', filename
+            ))
 
-        db.session.add(new_image)
+            # save image path in db
+            new_image = Images(imgPath = 'user_xrays/' + filename,
+                            patientId = new_patient.id)
+
+            db.session.add(new_image)
 
 
-        # analysis of images
+            # analysis of images
 
-        db.session.commit()
+            db.session.commit()
 
     return render_template('addPatient.html',
                         title='Add patient data',
@@ -252,6 +256,8 @@ def viewPatient(patientId):
         f.save(os.path.join(
             'static/user_xrays', filename
         ))
+
+        #add image analysis
 
         # save image path in db
         new_image = Images(imgPath = 'user_xrays/' + filename,
