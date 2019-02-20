@@ -56,6 +56,7 @@ class Images(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         imgPath = db.Column(db.String(120), nullable=False)
         patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
+        analysis = db.Column(db.String(60))
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
@@ -78,6 +79,9 @@ class searchPatientForm(FlaskForm):
 
 class updatePatientForm(FlaskForm):
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
+
+class addImageForm(FlaskForm):
+    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
 
 
 @login_manager.user_loader
@@ -170,7 +174,7 @@ def addPatient():
         f = form.img.data
         filename = secure_filename(f.filename)
         f.save(os.path.join(
-            'user_xrays', filename
+            'static/user_xrays', filename
         ))
 
         # save image path in db
@@ -191,9 +195,6 @@ def addPatient():
 @app.route('/searchPatient', methods=['GET', 'POST'])
 @login_required
 def searchPatient():
-
-    #1: initially display form to select a user from
-    #2: Then after submitted display the details of the patient
 
     form = searchPatientForm()
 
@@ -220,13 +221,16 @@ def viewPatient(patientId):
 
     doctor = User.query.filter_by(id=patient.doctorId).first()
 
-    form = updatePatientForm()
+    images = Images.query.filter_by(patientId=patientId).all()
 
-    if form.validate_on_submit():
+    form1 = updatePatientForm()
+
+    form2 = addImageForm()
+
+    #form for editing symptoms
+    if form1.validate_on_submit():
 
         patient = Patient.query.filter_by(id=patientId).first()
-
-        #new_symptoms = form.patientSymptoms.data
 
         patient.patientSymptoms = form.patientSymptoms.data
 
@@ -236,14 +240,35 @@ def viewPatient(patientId):
                              title="Viewing patient",
                              patient=patient,
                              doctor=doctor,
-                             form=form)
+                             images=images,
+                             form1=form1,
+                             form2=form2)
+
+    # form for adding x-ray
+    if form2.validate_on_submit():
+
+        f = form2.img.data
+        filename = secure_filename(f.filename)
+        f.save(os.path.join(
+            'static/user_xrays', filename
+        ))
+
+        # save image path in db
+        new_image = Images(imgPath = 'user_xrays/' + filename,
+                        patientId = patientId)
+
+        db.session.add(new_image)
+
+        db.session.commit()
 
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
                          patient=patient,
                          doctor=doctor,
-                         form=form)
+                         images=images,
+                         form1=form1,
+                         form2=form2)
 
 
 @app.route("/logout")

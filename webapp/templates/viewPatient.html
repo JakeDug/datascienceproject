@@ -26,14 +26,34 @@
     <label> Patient name:</label>  {{ patient.patientName }} <br><br>
     <label> Patient Symptoms:</label>  {{ patient.patientSymptoms }} <br><br>
     <label> Patient DoB:</label>  {{ patient.dob }} <br><br>
-    <label> Doctor:</label>{{ doctor.username }}
+    <label> Doctor:</label>{{ doctor.username }} <br><br>
+
+    {% for xray in images %}
+    <div class="text-center well-lg">
+      <img src="{{url_for('static', filename=xray.imgPath)}}" style="max-height: 30em; max-width:30em;"> <br><br>
+      <label> Verdict: </label>{{xray.analysis}} <br><br>
+    </div>
+    {% endfor %}
+
   </div>
+ <br><br>
+ <div class="container center_div">
+ <h2 class="text-center"> Add X-ray Image </h2> <br/>
+   <form action = '' method='post' enctype="multipart/form-data">
+
+     {{ form2.hidden_tag() }}
+     {{ wtf.form_field(form2.img) }}
+
+     <button class="btn" type="submit"> Add X-Ray </button>
+
+   </form>
+ </div>
  <br><br>
 <h2 class="text-center"> Edit patient symptoms </h2> <br/>
     <form action = '' method='post'>
 
-      {{ form.hidden_tag() }}
-      {{ wtf.form_field(form.patientSymptoms) }}
+      {{ form1.hidden_tag() }}
+      {{ wtf.form_field(form1.patientSymptoms) }}
 
       <button class="btn btn-lg btn-primary btn-block" type="submit"> Confirm new patient symptoms </button>
     </form>
