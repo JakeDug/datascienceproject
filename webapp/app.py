@@ -56,6 +56,7 @@ class Images(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         imgPath = db.Column(db.String(120), nullable=False)
         patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
+        analysis = db.Column(db.String(60))
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
