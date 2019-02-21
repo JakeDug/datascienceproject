@@ -3,7 +3,7 @@ from flask_login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, IntegerField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired, Length, Email
 from flask_bootstrap import Bootstrap
@@ -56,7 +56,8 @@ class Images(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         imgPath = db.Column(db.String(120), nullable=False)
         patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
-        analysis = db.Column(db.String(60))
+        analysis = db.Column(db.Boolean)
+        confidence = db.Column(db.Float)
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
 class loginForm(FlaskForm):
@@ -72,7 +73,7 @@ class addPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
     patientSymptoms = StringField('Symptoms', validators=[InputRequired(), Length(min=6, max=200)])
     dob = DateField('Date of Birth', format='%Y-%m-%d')
-    img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
+    img = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
 
 class searchPatientForm(FlaskForm):
     patientName = StringField('Name', validators=[InputRequired(), Length(min=6, max=30)])
@@ -82,6 +83,9 @@ class updatePatientForm(FlaskForm):
 
 class addImageForm(FlaskForm):
     img = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg'], 'IMAGES ONLY') ])
+
+class analyseImageForm(FlaskForm):
+    imgId = IntegerField('ID')
 
 
 @login_manager.user_loader
@@ -172,21 +176,24 @@ def addPatient():
 
         # save image
         f = form.img.data
-        filename = secure_filename(f.filename)
-        f.save(os.path.join(
-            'static/user_xrays', filename
-        ))
 
-        # save image path in db
-        new_image = Images(imgPath = 'user_xrays/' + filename,
-                        patientId = new_patient.id)
+    #    if f.filename != '':
+        if form.img.data:
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(
+                'static/user_xrays', filename
+            ))
 
-        db.session.add(new_image)
+            # save image path in db
+            new_image = Images(imgPath = 'user_xrays/' + filename,
+                            patientId = new_patient.id)
+
+            db.session.add(new_image)
 
 
-        # analysis of images
+            # analysis of images
 
-        db.session.commit()
+            db.session.commit()
 
     return render_template('addPatient.html',
                         title='Add patient data',
@@ -227,6 +234,8 @@ def viewPatient(patientId):
 
     form2 = addImageForm()
 
+    form3 = analyseImageForm()
+
     #form for editing symptoms
     if form1.validate_on_submit():
 
@@ -242,7 +251,8 @@ def viewPatient(patientId):
                              doctor=doctor,
                              images=images,
                              form1=form1,
-                             form2=form2)
+                             form2=form2,
+                             form3=form3)
 
     # form for adding x-ray
     if form2.validate_on_submit():
@@ -253,6 +263,8 @@ def viewPatient(patientId):
             'static/user_xrays', filename
         ))
 
+        #add image analysis
+
         # save image path in db
         new_image = Images(imgPath = 'user_xrays/' + filename,
                         patientId = patientId)
@@ -261,6 +273,22 @@ def viewPatient(patientId):
 
         db.session.commit()
 
+    if form3.validate_on_submit():
+        #get the image we want via id
+        imageToCheck = Images.query.filter_by(id=form3.imgId).first()
+        #get the image src and the filename
+        imgSrc = imageToCheck.imgPath
+        imgFileName = imgSrc.split("/")[1]
+        path = "user_xrays/"
+        #pass the imgsrc & filename into the method
+        methodName(path, imgFileName)
+
+        #method will return Verdict and Confidence
+
+        #update img to have Verdict and Confidence
+        #imageToCheck.analysis =
+        #imageToCheck.confidence =
+        #db.session.commit()
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
@@ -268,7 +296,8 @@ def viewPatient(patientId):
                          doctor=doctor,
                          images=images,
                          form1=form1,
-                         form2=form2)
+                         form2=form2,
+                         form3=form3)
 
 
 @app.route("/logout")

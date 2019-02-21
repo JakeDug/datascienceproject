@@ -3,10 +3,12 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
-<nav class="navbar navbar-inverse navbar-static-top">
+<nav class="navbar navbar-inverse navbar-static-top" style="min-height: 7em;">
   <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="{{ url_for('welcome')}}">Pneumonia app</a>
+          <a class="navbar-brand" href="{{ url_for('welcome')}}">
+            <img src="{{url_for('static', filename='Images/logoResized.png')}}" width="80em" height="80em" style="margin-top: -1;" alt="Pneumonia App">
+          </a>
         </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
@@ -32,6 +34,14 @@
     <div class="text-center well-lg">
       <img src="{{url_for('static', filename=xray.imgPath)}}" style="max-height: 30em; max-width:30em;"> <br><br>
       <label> Verdict: </label>{{xray.analysis}} <br><br>
+      <label> confidence: </label>{{xray.confidence}} <br><br>
+
+      <form action = '' method='post'>
+        {{ form3.hidden_tag() }}
+        {{ form3.hidden_tag(form3.imgId(value=xray.id)) }}
+         <button class="btn" type="submit" style="width: 30em;"> Analyse Image </button>
+      </form>
+
     </div>
     {% endfor %}
 
