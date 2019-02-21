@@ -279,9 +279,9 @@ def viewPatient(patientId):
         #get the image src and the filename
         imgSrc = imageToCheck.imgPath
         imgFileName = imgSrc.split("/")[1]
-
+        path = "user_xrays/"
         #pass the imgsrc & filename into the method
-        methodName(imgSrc, imgFileName)
+        methodName(path, imgFileName)
 
         #method will return Verdict and Confidence
 
