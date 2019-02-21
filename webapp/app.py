@@ -63,7 +63,7 @@ class Images(UserMixin, db.Model):
         id = db.Column(db.Integer, primary_key=True)
         imgPath = db.Column(db.String(120), nullable=False)
         patientId = db.Column(db.ForeignKey(Patient.id), nullable=False)
-        analysis = db.Column(db.Boolean)
+        analysis = db.Column(db.String(20))
         confidence = db.Column(db.Float)
 
 #define forms and their fields that will display for Signup, login, AddPatient and searchPatient
@@ -150,6 +150,7 @@ def signup():
             new_user = User(username = form.username.data, email = form.email.data, password = form.password.data)
             db.session.add(new_user)
             db.session.commit()
+            return redirect(url_for('login'))
 
     return render_template('signup.html',
                         title='Sign Up',
@@ -184,12 +185,13 @@ def addPatient():
         # save image
         f = form.img.data
 
-    #    if f.filename != '':
         if form.img.data:
             filename = secure_filename(f.filename)
             f.save(os.path.join(
                 'static/user_xrays', filename
             ))
+
+            #cluster.cluster(imgFileName)
 
             # save image path in db
             new_image = Images(imgPath = 'user_xrays/' + filename,
@@ -197,10 +199,11 @@ def addPatient():
 
             db.session.add(new_image)
 
-
-            # analysis of images
-
             db.session.commit()
+        flash('Patient added', 'error')
+        return render_template('addPatient.html',
+                            title='Add patient data',
+                            form=form)
 
     return render_template('addPatient.html',
                         title='Add patient data',
@@ -238,9 +241,7 @@ def viewPatient(patientId):
     images = Images.query.filter_by(patientId=patientId).all()
 
     form1 = updatePatientForm()
-
     form2 = addImageForm()
-
     form3 = analyseImageForm()
 
     #form for editing symptoms
@@ -259,8 +260,7 @@ def viewPatient(patientId):
                              images=images,
                              form1=form1,
                              form2=form2,
-                             form3=form3,
-                             classification=classification)
+                             form3=form3)
 
     # form for adding x-ray
     if form2.validate_on_submit():
@@ -271,7 +271,7 @@ def viewPatient(patientId):
             'static/user_xrays', filename
         ))
 
-        #add image analysis
+        #cluster.cluster(filename)
 
         # save image path in db
         new_image = Images(imgPath = 'user_xrays/' + filename,
@@ -281,6 +281,15 @@ def viewPatient(patientId):
 
         db.session.commit()
 
+        return render_template('viewPatient.html',
+                             title="Viewing patient",
+                             patient=patient,
+                             doctor=doctor,
+                             images=images,
+                             form1=form1,
+                             form2=form2,
+                             form3=form3)
+
     if form3.validate_on_submit():
         #get the image we want via id
         idToSearch = int(form3.imgId.data)
@@ -289,17 +298,14 @@ def viewPatient(patientId):
         #get the image src and the filename
         imgSrc = imageToCheck.imgPath
         imgFileName = imgSrc.split("/")[1]
-        path = "user_xrays/"
-
-        # TODO: add cluster method
-        #cluster.cluster(imgFileName)
+        path = "static/user_xrays/"
 
         #pass the imgsrc & filename into the method
         classification = new_test.classify_image(path, imgFileName)
         #update img to have Verdict and Confidence
-    #    imageToCheck.analysis = classification[0]
-    #    imageToCheck.confidence = classification[1]
-    #    db.session.commit()
+        imageToCheck.analysis = classification[0]
+        imageToCheck.confidence = classification[1]
+        db.session.commit()
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
@@ -308,8 +314,7 @@ def viewPatient(patientId):
                          images=images,
                          form1=form1,
                          form2=form2,
-                         form3=form3,
-                         classification=classification)
+                         form3=form3)
 
 
 @app.route("/logout")
