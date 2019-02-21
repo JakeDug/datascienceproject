@@ -2,4 +2,3 @@
 
 # TO-DO
 - Refactor forms and database tables into their own py files
-- Add Image analysis functionality
