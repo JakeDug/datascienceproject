@@ -24,6 +24,8 @@
 <div class="container center_div">
   <h1 class="text-center well-lg"> {{title}} </h1>
 
+  {{ classification }}
+
   <div class="text-center well-lg" style="display: grid; ">
     <label> Patient name:</label>  {{ patient.patientName }} <br><br>
     <label> Patient Symptoms:</label>  {{ patient.patientSymptoms }} <br><br>
@@ -35,10 +37,11 @@
       <img src="{{url_for('static', filename=xray.imgPath)}}" style="max-height: 30em; max-width:30em;"> <br><br>
       <label> Verdict: </label>{{xray.analysis}} <br><br>
       <label> confidence: </label>{{xray.confidence}} <br><br>
+      <label> ID: </label>{{xray.id}} <br><br>
 
       <form action = '' method='post'>
         {{ form3.hidden_tag() }}
-        {{ form3.hidden_tag(form3.imgId(value=xray.id)) }}
+    <span style="display: none;">    {{ form3.imgId(value=(xray.id)) }} </span>
          <button class="btn" type="submit" style="width: 30em;"> Analyse Image </button>
       </form>
 

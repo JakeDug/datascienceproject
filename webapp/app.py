@@ -14,6 +14,13 @@ from werkzeug.utils import secure_filename
 
 import os
 
+import new_test
+import tensorflow as tf
+import numpy as np
+import cv2
+
+import cluster
+
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
@@ -223,7 +230,7 @@ def searchPatient():
 @app.route('/viewDetails/<patientId>', methods=['GET', 'POST'])
 @login_required
 def viewPatient(patientId):
-
+    classification =()
     patient = Patient.query.filter_by(id=patientId).first()
 
     doctor = User.query.filter_by(id=patient.doctorId).first()
@@ -252,7 +259,8 @@ def viewPatient(patientId):
                              images=images,
                              form1=form1,
                              form2=form2,
-                             form3=form3)
+                             form3=form3,
+                             classification=classification)
 
     # form for adding x-ray
     if form2.validate_on_submit():
@@ -275,20 +283,23 @@ def viewPatient(patientId):
 
     if form3.validate_on_submit():
         #get the image we want via id
-        imageToCheck = Images.query.filter_by(id=form3.imgId).first()
+        idToSearch = int(form3.imgId.data)
+
+        imageToCheck = Images.query.filter_by(id=idToSearch).first()
         #get the image src and the filename
         imgSrc = imageToCheck.imgPath
         imgFileName = imgSrc.split("/")[1]
         path = "user_xrays/"
+
+        # TODO: add cluster method
+        #cluster.cluster(imgFileName)
+
         #pass the imgsrc & filename into the method
-        methodName(path, imgFileName)
-
-        #method will return Verdict and Confidence
-
+        classification = new_test.classify_image(path, imgFileName)
         #update img to have Verdict and Confidence
-        #imageToCheck.analysis =
-        #imageToCheck.confidence =
-        #db.session.commit()
+    #    imageToCheck.analysis = classification[0]
+    #    imageToCheck.confidence = classification[1]
+    #    db.session.commit()
 
     return render_template('viewPatient.html',
                          title="Viewing patient",
@@ -297,7 +308,8 @@ def viewPatient(patientId):
                          images=images,
                          form1=form1,
                          form2=form2,
-                         form3=form3)
+                         form3=form3,
+                         classification=classification)
 
 
 @app.route("/logout")
