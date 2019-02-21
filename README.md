@@ -14,6 +14,8 @@ Created using Python and FLask with the help of the following libraries
 - wtforms
 - flask bootstrap
 - flask wtf
+- flask_upload
+- werkzeug
 
 # Team 
 - Adriaan Van Wyk
@@ -22,3 +24,5 @@ Created using Python and FLask with the help of the following libraries
 
 # Live app on python anywhere (Still in progress)
 http://pneumoniarecognition.pythonanywhere.com/
+
+pythonanywhere version is not up to date with working app
