@@ -33,12 +33,12 @@
     {% for xray in images %}
     <div class="text-center well-lg">
       <img src="{{url_for('static', filename=xray.imgPath)}}" style="max-height: 30em; max-width:30em;"> <br><br>
-      <label> Verdict: </label>{{xray.analysis}} <br><br>
-      <label> confidence: </label>{{xray.confidence}} <br><br>
+      <label style="margin-right: 1em;"> Verdict: </label>{{xray.analysis}} <br><br>
+      <label style="margin-right: 1em;"> Confidence: </label>{{xray.confidence}}% <br><br>
 
       <form action = '' method='post'>
         {{ form3.hidden_tag() }}
-        <span style="display: none;">    {{ form3.imgId(value=(xray.id)) }} </span>
+        <span style="display: none;"> {{ form3.imgId(value=(xray.id)) }} </span>
         <button class="btn" type="submit" style="width: 30em;"> Analyse Image </button>
       </form>
 
