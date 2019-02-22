@@ -5,8 +5,6 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-# module-level variables ##############################################################################################
-RETRAINED_LABELS_TXT_FILE_LOC = os.getcwd() + "\\" + "retrained_labels.txt"
 RETRAINED_GRAPH_PB_FILE_LOC = os.getcwd() + "\\" + "retrained_graph.pb"
 TEST_IMAGES_DIR = os.getcwd() + "static\\user_xrays"
 
@@ -41,14 +39,4 @@ def classify_image(image_path, filename):
         sortedPredictions = predictions[0].argsort()[-len(predictions[0]):][::-1]
 
         return classifications[sortedPredictions[0]], "{0:.2f}".format(predictions[0][sortedPredictions[0]]*100)
-#######################################################################################################################
-def main():
-    print("starting program . . .")
 
-    prediction = classify_image(TEST_IMAGES_DIR, 'clustered_IM-0010-0001.jpeg', )
-
-    print(prediction)
-
-# end main
-if __name__ == "__main__":
-    main()
