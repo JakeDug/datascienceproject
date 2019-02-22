@@ -26,7 +26,9 @@ Along with each model is a .csv file with logged which predictions were correct 
 The clustered images and unclustered image sets are identical apart from the clustering and so comparisons can be drawn
 between the two sets in relation to accuracy, time taken to train, image size etc.
 
-The image clustering is descibed in the following section 
+The image clustering is descibed in the following section
+
+For the web application to make a successful prediction, it requires the retrained_graph.pb file which contains the neural-network
 
 # K-means Clustering 
 
